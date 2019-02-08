@@ -2,17 +2,62 @@
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/>
+
+    <form>
+      <label>username</label>
+      <input type="text" v-model="credentials.username">
+
+      <label>password</label>
+      <input type="text" v-model="credentials.password">
+
+      <button @click.prevent="submit">Submit</button>
+    </form>
+
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import { UserStateActions } from './stores/user-state';
 
 export default {
   name: 'app',
   components: {
     HelloWorld
+  },
+  data() {
+    return {
+      credentials: {
+        username: null,
+        password: null
+      }
+    }
+  },
+  beforeCreate() {
+    console.log('Checking inital token')
+    const currentToken = sessionStorage.getItem('TOKEN');
+    if (currentToken) {
+      console.log('token present, set it to store')
+      this.$store.dispatch(UserStateActions.setAuth, currentToken);
+    }
+  },
+  methods: {
+    submit() {
+      console.log('will submit', this.credentials);
+      this.$http.post('/api/v1/auth/login', {
+        username: this.credentials.username,
+        password: this.credentials.password
+      }).then((response) => {
+        // success callback
+        this.token = response.headers.get('x-mnc-auth');
+        this.$store.dispatch(UserStateActions.setAuth, this.token);
+      }, response => {
+        // error callback
+        console.log('error', response);
+      });
+    }
   }
+
 }
 </script>
 

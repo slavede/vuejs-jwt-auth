@@ -27,12 +27,66 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+
+  <div>
+
+
+    <div>
+      <div>
+        Current token {{token}}
+      </div>
+      <button @click.prevent="validate">Validate Token</button>
+    </div>
   </div>
+
+  </div>
+
+
 </template>
 
 <script>
+import {UserStateActions} from '../stores/user-state.js';
+
 export default {
   name: 'HelloWorld',
+  data: () => {
+    console.log('Returning data');
+    return {
+      token: null
+    }
+  },
+  created() {
+    console.log('subscribe to setAuth mutation');
+    const currentToken = this.$store.state.userState.token;
+    if (currentToken) {
+      console.log('init set token');
+      this.setToken(currentToken);
+    }
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === UserStateActions.setAuth && state.userState.token) {
+        console.log('change set token');
+        this.setToken(state.userState.token);
+      }
+    });
+  },
+  methods: {
+    validate() {
+      console.log('Validating token');
+
+      this.$http.post('/api/v1/token/validate', {
+        token: this.token
+      }).then((response) => {
+        // success callback
+        console.log('success', response);
+      }, response => {
+        // error callback
+        console.log('error', response);
+      });
+    },
+    setToken(token) {
+      this.token = token;
+    }
+  },
   props: {
     msg: String
   }
