@@ -19,6 +19,7 @@
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 import { UserStateActions } from './stores/user-state';
+import axios from 'axios';
 
 export default {
   name: 'app',
@@ -44,12 +45,23 @@ export default {
   methods: {
     submit() {
       console.log('will submit', this.credentials);
-      this.$http.post('/api/v1/auth/login', {
+      // if using vue-resource
+      // const promise = this.$http.post('/api/v1/auth/login', {
+      //   username: this.credentials.username,
+      //   password: this.credentials.password
+      // });
+      // if using axios
+      const promise = axios.post('/api/v1/auth/login', {
         username: this.credentials.username,
         password: this.credentials.password
-      }).then((response) => {
+      });
+      promise.then((response) => {
         // success callback
-        this.token = response.headers.get('x-mnc-auth');
+        console.log('Login response', response);
+        // if using vue-resource
+        // this.token = response.headers.get('x-mnc-auth');
+        // if using axios
+        this.token = response.headers['x-mnc-auth'];
         this.$store.dispatch(UserStateActions.setAuth, this.token);
       }, response => {
         // error callback

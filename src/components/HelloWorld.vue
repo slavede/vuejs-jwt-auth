@@ -46,6 +46,7 @@
 
 <script>
 import {UserStateActions} from '../stores/user-state.js';
+import axios from 'axios';
 
 export default {
   name: 'HelloWorld',
@@ -73,9 +74,15 @@ export default {
     validate() {
       console.log('Validating token');
 
-      this.$http.post('/api/v1/token/validate', {
+      // const promise = this.$http.post('/api/v1/token/validate', {
+      //   token: this.token
+      // })
+      // if using axios
+      const promise = axios.post('/api/v1/token/validate', {
         token: this.token
-      }).then((response) => {
+      });
+
+      promise.then((response) => {
         // success callback
         console.log('success', response);
       }, response => {
