@@ -47,13 +47,15 @@
 <script>
 import {UserStateActions} from '../stores/user-state.js';
 import axios from 'axios';
+import AuthApi from '../api/auth-api.js';
 
 export default {
   name: 'HelloWorld',
   data: () => {
     console.log('Returning data');
     return {
-      token: null
+      token: null,
+      authApi: null
     }
   },
   created() {
@@ -69,20 +71,14 @@ export default {
         this.setToken(state.userState.token);
       }
     });
+
+    this.authApi = new AuthApi()
   },
   methods: {
     validate() {
       console.log('Validating token');
 
-      // const promise = this.$http.post('/api/v1/token/validate', {
-      //   token: this.token
-      // })
-      // if using axios
-      const promise = axios.post('/api/v1/token/validate', {
-        token: this.token
-      });
-
-      promise.then((response) => {
+      this.authApi.validateToken(this.token).then((response) => {
         // success callback
         console.log('success', response);
       }, response => {

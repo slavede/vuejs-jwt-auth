@@ -20,6 +20,7 @@
 import HelloWorld from './components/HelloWorld.vue'
 import { UserStateActions } from './stores/user-state';
 import axios from 'axios';
+import AuthApi from './api/auth-api.js';
 
 export default {
   name: 'app',
@@ -41,20 +42,16 @@ export default {
       console.log('token present, set it to store')
       this.$store.dispatch(UserStateActions.setAuth, currentToken);
     }
+
+  },
+  created() {
+    this.authApi = new AuthApi()
   },
   methods: {
     submit() {
       console.log('will submit', this.credentials);
-      // if using vue-resource
-      // const promise = this.$http.post('/api/v1/auth/login', {
-      //   username: this.credentials.username,
-      //   password: this.credentials.password
-      // });
-      // if using axios
-      const promise = axios.post('/api/v1/auth/login', {
-        username: this.credentials.username,
-        password: this.credentials.password
-      });
+
+      const promise = this.authApi.login(this.credentials.username, this.credentials.password);
       promise.then((response) => {
         // success callback
         console.log('Login response', response);
